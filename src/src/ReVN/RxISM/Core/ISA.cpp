@@ -14,15 +14,13 @@ namespace ZQF::ReVN::RxISM
     {
         ZxFile ifs{ msPackPath, ZxFile::OpenMod::ReadSafe };
 
-        const auto hdr_bin = ifs.Get<Struct::ISA::HDR>();
+        const auto hdr_bin{ ifs.Get<Struct::ISA::HDR>() };
+        if (hdr_bin.nFlag & 0x8000) { throw std::runtime_error("RxISM::ISA::Export(): unsupported"); }
 
-        const auto file_count = static_cast<std::size_t>(hdr_bin.nFileCount);
+        const auto file_count{ static_cast<std::size_t>(hdr_bin.nFileCount) };
 
-        ZxMem index_table_mem;
-        {
-            index_table_mem.Resize(file_count * Struct::ISA::Entry::SizeBytes(), true, true);
-            ifs.Read(index_table_mem.Span());
-        }
+        ZxMem index_table_mem{ file_count * Struct::ISA::Entry::SizeBytes() };
+        ifs.Read(index_table_mem.Span());
 
         ZxCvt cvt;
         ZxMem cache;
@@ -32,7 +30,7 @@ namespace ZQF::ReVN::RxISM
             ifs.Seek(entry.nFOA, ZxFile::MoveWay::Set);
             cache.Resize(entry.nBytes, true, true);
             ifs.Read(cache.Span());
-            cache.Save(sav_dir.append(cvt.MBCSToUTF8(entry.aFileName.data(), 932)));
+            cache.Save(sav_dir.append(cvt.MBCSToUTF8(entry.aFileName, 932)));
             sav_dir.resize(msDir.size());
         }
     }

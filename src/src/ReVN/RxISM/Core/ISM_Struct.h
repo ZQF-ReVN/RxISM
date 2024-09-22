@@ -12,16 +12,16 @@ namespace ZQF::ReVN::RxISM
         {
             struct HDR
             {
-                std::array<char, 0xC> aSignature;
+                char aSignature[0xC];
                 std::uint16_t nFileCount;
-                std::uint16_t nUnknown;
+                std::uint16_t nFlag;
 
-                static auto SizeBytes() -> std::size_t { return sizeof(aSignature) + sizeof(nFileCount) + sizeof(nUnknown); }
+                static auto SizeBytes() -> std::size_t { return sizeof(aSignature) + sizeof(nFileCount) + sizeof(nFlag); }
             };
 
             struct Entry
             {
-                std::array<char, 0x34> aFileName;
+                char aFileName[0x34];
                 std::uint32_t nFOA;  // .isa file offset address
                 std::uint32_t nBytes;
                 std::uint32_t nUn;   // 00

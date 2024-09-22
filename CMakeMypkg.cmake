@@ -10,7 +10,7 @@ FetchContent_MakeAvailable(ZxFile)
 FetchContent_Declare(
   ZxMem
   GIT_REPOSITORY https://github.com/ZQF-Zut/ZxMem.git
-  GIT_TAG 7714f41d625acc017b9aa083024d526eef769345)
+  GIT_TAG 873edf0a29e0c54c1003d3544a02010769cea7b8)
 
 FetchContent_MakeAvailable(ZxMem)
 
@@ -27,3 +27,10 @@ FetchContent_Declare(
   GIT_TAG f7c3d1082b050d203246ca259ea07893c5033494)
 
 FetchContent_MakeAvailable(ZxFS)
+
+FetchContent_Declare(
+  ZxJson
+  GIT_REPOSITORY https://github.com/ZQF-Zut/ZxJson.git
+  GIT_TAG 22b06c6c72193d1ffd8700f2c823575f0a1caf73)
+
+FetchContent_MakeAvailable(ZxJson)

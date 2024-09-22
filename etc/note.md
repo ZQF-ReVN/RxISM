@@ -83,10 +83,8 @@ struct ISM
 		uint32_t nLocalFunctionCount_;
     };
     
-    struct ObjectInfo
+    union ObjectInfo
     {
-        union
-        {
         struct Function
 		{
 			uint32_t nOffset; // CodeSeg Offset
@@ -100,7 +98,10 @@ struct ISM
 			uint32_t nUn;
 			uint32_t nUn;
 		};
-        }
+        
+        
+        Function FunctionInfo;
+        GlobalVar GlobalVarInfo;
     }
     
     struct LocalFunctionTable
@@ -120,7 +121,7 @@ struct ISM
         uint32_t nCount; // func + galoblvar
         uint32_t nFunctionCount;
         uint32_t nGlobalVarCount;
-        Array<ISM::Name, nCount> aImportTable;
+        Array<ISM::SymbolName, nCount> aImportTable;
     };
     
     struct ExportSymbolTable
