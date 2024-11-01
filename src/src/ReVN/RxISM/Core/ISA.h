@@ -11,6 +11,6 @@ namespace ZQF::ReVN::RxISM
 	{
 	public:
 		static auto Export(const std::string_view msPackPath, const std::string_view msDir) -> void;
-		static auto Import(const std::string_view msDir, const std::string_view msPackPath) -> void;
+		static auto Import(const std::string_view msDir, const std::string_view msPackPath, const std::string_view msSignature) -> void;
 	};
 } // namespace ZQF::ReVN::RxISM

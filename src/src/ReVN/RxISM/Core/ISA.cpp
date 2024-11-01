@@ -14,10 +14,10 @@ namespace ZQF::ReVN::RxISM
     {
         ZxFile ifs{ msPackPath, ZxFile::OpenMod::ReadSafe };
 
-        const auto hdr_bin{ ifs.Get<Struct::ISA::HDR>() };
+        const auto hdr_bin = ifs.Get<Struct::ISA::HDR>();
         if (hdr_bin.nFlag & 0x8000) { throw std::runtime_error("RxISM::ISA::Export(): unsupported"); }
 
-        const auto file_count{ static_cast<std::size_t>(hdr_bin.nFileCount) };
+        const auto file_count = static_cast<std::size_t>(hdr_bin.nFileCount);
 
         ZxMem index_table_mem{ file_count * Struct::ISA::Entry::SizeBytes() };
         ifs.Read(index_table_mem.Span());
@@ -35,7 +35,7 @@ namespace ZQF::ReVN::RxISM
         }
     }
 
-    auto ISA::Import(const std::string_view msDir, const std::string_view msPackPath) -> void
+    auto ISA::Import(const std::string_view msDir, const std::string_view msPackPath, const std::string_view msSignature) -> void
     {
         const auto file_path_vec = ZxFS::Searcher::GetFilePaths(msDir, true, false);
 
@@ -43,7 +43,7 @@ namespace ZQF::ReVN::RxISM
 
         ZxMem& index_mem = cache_mem;
         {
-            index_mem << std::span{ std::string_view{"ISM ENGLISH "} } << static_cast<std::uint16_t>(file_path_vec.size()) << static_cast<std::uint16_t>(0);
+            index_mem << std::span{ msSignature } << static_cast<std::uint16_t>(file_path_vec.size()) << static_cast<std::uint16_t>(0);
 
             ZxCvt cvt;
             auto foa{ static_cast<std::uint32_t>(index_mem.SizeBytes()) };
@@ -66,7 +66,7 @@ namespace ZQF::ReVN::RxISM
 
         ZxFile ofs_isa{ msPackPath, ZxFile::OpenMod::WriteForce };
         {
-            ofs_isa << index_mem.Span();
+            ofs_isa.Write(index_mem.Span());
 
             ZxMem& data_mem = cache_mem;
             for (const auto& file_path : file_path_vec)
