@@ -34,7 +34,7 @@ endif()
 if((MSVC) AND (CMAKE_SIZEOF_VOID_P EQUAL 4))
     # Set Source File Path
     list(APPEND ReVN_RxISM_Hook_Src_Files
-        "src/ReVN/RxISM/Hook/VFS_Hook.cpp")
+        "src/ReVN/RxISM/Hook/VFS_Patch.cpp")
 
     # Set Library
     add_library(ReVN_RxISM_Hook ${ReVN_RxISM_Hook_Src_Files})

@@ -1,28 +1,41 @@
 #include <Windows.h>
-#include <ZxHook/SHooker.h>
-#include <ReVN/RxISM/Hook/VFS_Hook.h>
+#include <memory>
+#include <string>
+#include <ReVN/RxISM/Hook/VFS_Patch.h>
 
-namespace ZxHook { using namespace ZQF::ZxHook; }
 namespace RxISM { using namespace ZQF::ReVN::RxISM; }
 
-static auto __stdcall LoadLibraryA_Hook(LPCSTR lpLibFileName) -> HMODULE
+
+static auto GetModuleFileDir(const HMODULE hModule) -> std::pair<std::wstring_view, std::unique_ptr<wchar_t[]>>
 {
-    if (::strncmp(lpLibFileName, "ISM.DLL", 7) == 0)
+    std::uint32_t written_chars{};
+    std::uint32_t buffer_max_chars = MAX_PATH;
+    std::unique_ptr<wchar_t[]> buffer;
+    do
     {
-        const auto hdll = ZxHook::SHooker<LoadLibraryA_Hook>::FnRaw(lpLibFileName);
-        if (hdll != NULL)
-        {
-            RxISM::VFSHook::Install(L"_Nukige_\\patch\\", reinterpret_cast<std::size_t>(hdll) + 0x1A7DA);
-        }
-        ZxHook::SHooker<LoadLibraryA_Hook>::DetachAndCommit();
-        return hdll;
+        buffer_max_chars *= 2;
+        buffer = std::make_unique_for_overwrite<wchar_t[]>(buffer_max_chars);
+        written_chars = ::GetModuleFileNameW(hModule, buffer.get(), buffer_max_chars);
+    } while (written_chars >= buffer_max_chars);
+
+    std::wstring_view path_str{ buffer.get() , written_chars };
+    const auto pos = path_str.rfind(L'\\');
+    if (pos != std::wstring_view::npos)
+    {
+        path_str = path_str.substr(0, pos + 1);
     }
-    return ZxHook::SHooker<LoadLibraryA_Hook>::FnRaw(lpLibFileName);
+    else
+    {
+        path_str = L"";
+    }
+
+    return { path_str, std::move(buffer) };
 }
 
-static auto StartHook(HMODULE /* hDllBase */) -> void
+static auto StartHook(const HMODULE hDllBase) -> void
 {
-    ZxHook::SHooker<LoadLibraryA_Hook>::AttachAndCommit(::LoadLibraryA);
+    const auto dll_dir = ::GetModuleFileDir(hDllBase);
+    RxISM::VFSPatch::Install(std::wstring{ dll_dir.first }.append(L"VFS\\"), 108506);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID /* lpReserved */)
