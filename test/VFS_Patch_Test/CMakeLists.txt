@@ -3,7 +3,7 @@ if(NOT ((MSVC) AND (CMAKE_SIZEOF_VOID_P EQUAL 4)))
 endif()
 
 # Project Name
-project(ReVN_RxISM_VFS_Hook_Test)
+project(ReVN_RxISM_VFS_Patch_Test)
 
 # Test Project
 add_library("${PROJECT_NAME}" MODULE "dllmain.cpp")
